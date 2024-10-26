@@ -21,8 +21,6 @@ def init_db():
     connection.commit()
     connection.close()
 
-init_db()
-
 def add_user(name, phone_number, user_id):
     connection = sqlite3.connect("fake_kfc.db")
     sql = connection.cursor()
