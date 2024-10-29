@@ -17,15 +17,34 @@ def init_db():
     sql.execute("CREATE TABLE IF NOT EXISTS cart (user_id INTEGER,"
             "pr_id INTEGER, pr_count INTEGER, pr_name TEXT, "
             "total_price REAL);")
-
+    # Удаление таблицы users для пересоздания
+    sql.execute("DROP TABLE IF EXISTS users;")
+    sql.execute("CREATE TABLE IF NOT EXISTS users "
+            "(user_id INTEGER PRIMARY KEY, "
+            "name TEXT, phone_number TEXT, "
+            "address TEXT, language TEXT, reg_date DATETIME);")
     connection.commit()
     connection.close()
 
-def add_user(name, phone_number, user_id):
+def add_user(name, phone_number, user_id, address, language):
     connection = sqlite3.connect("fake_kfc.db")
     sql = connection.cursor()
-    sql.execute(f"INSERT INTO users (user_id, name, phone_number, reg_date)"
-                "VALUES (?, ?, ?, ?);", (user_id, name, phone_number, datetime.now()))
+    sql.execute(f"INSERT INTO users (user_id, name, phone_number, address, language, reg_date) "
+                "VALUES (?, ?, ?, ?, ?, ?);", (user_id, name, phone_number, address, language, datetime.now()))
+    connection.commit()
+    connection.close()
+
+def get_user_language(user_id):
+    connection = sqlite3.connect("fake_kfc.db")
+    sql = connection.cursor()
+    result = sql.execute("SELECT language FROM users WHERE user_id=?", (user_id,)).fetchone()
+    connection.close()
+    return result[0] if result else "ru"  # Возвращаем 'ru' по умолчанию, если пользователь не найден
+
+def update_user_language(user_id, language):
+    connection = sqlite3.connect("fake_kfc.db")
+    sql = connection.cursor()
+    sql.execute("UPDATE users SET language = ? WHERE user_id = ?", (language, user_id))
     connection.commit()
     connection.close()
 
